@@ -3,14 +3,15 @@ package com.example.android.instagramclone
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.android.instagramclone.auth.SignupScreen
 import com.example.android.instagramclone.ui.theme.InstagramCloneTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -29,10 +30,20 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+sealed class DestinationScreen(val route: String){
+    object Signup: DestinationScreen("signup")
+}
+
 @Composable
 fun InstagramApp() {
     val vm = hiltViewModel<IgViewModel>()
-    val i = 0
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = DestinationScreen.Signup.route){
+        composable(DestinationScreen.Signup.route){
+            SignupScreen(navController = navController, vm = vm)
+        }
+    }
 }
 
 @Preview(showBackground = true)
