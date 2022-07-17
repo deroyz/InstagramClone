@@ -1,6 +1,5 @@
 package com.example.android.instagramclone
 
-import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -25,5 +24,4 @@ class HiltModule {
 
     @Provides
     fun provideStorage(): FirebaseStorage = Firebase.storage
-
 }

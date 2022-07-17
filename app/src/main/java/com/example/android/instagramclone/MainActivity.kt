@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.android.instagramclone.auth.SignupScreen
+import com.example.android.instagramclone.main.NotificationMessage
 import com.example.android.instagramclone.ui.theme.InstagramCloneTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -38,6 +39,8 @@ sealed class DestinationScreen(val route: String){
 fun InstagramApp() {
     val vm = hiltViewModel<IgViewModel>()
     val navController = rememberNavController()
+    
+    NotificationMessage(vm = vm)
 
     NavHost(navController = navController, startDestination = DestinationScreen.Signup.route){
         composable(DestinationScreen.Signup.route){
