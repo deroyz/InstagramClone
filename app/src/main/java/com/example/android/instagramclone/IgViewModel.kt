@@ -36,6 +36,10 @@ class IgViewModel @Inject constructor(
     }
 
     fun onSignup(username: String, email: String, pass: String) {
+        if (username.isEmpty() or email.isEmpty() || pass.isEmpty()) {
+            handleException(customMessage = "Please fill in all fields")
+            return
+        }
         inProgress.value = true
         db.collection(USERS).whereEqualTo("username", username).get()
             .addOnSuccessListener { documents ->
@@ -57,6 +61,30 @@ class IgViewModel @Inject constructor(
                 }
             }
             .addOnFailureListener { }
+    }
+
+    fun onLogin(email: String, pass: String) {
+        if (email.isEmpty() || pass.isEmpty()) {
+            handleException(customMessage = "Please fill in all fields")
+            return
+        }
+        inProgress.value = true
+        auth.signInWithEmailAndPassword(email, pass)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    signedIn.value = true
+                    inProgress.value = false
+                    handleException(customMessage = "Login success")
+                    auth.currentUser?.uid?.let { uid -> getUserData(uid) }
+                } else {
+                    handleException(task.exception, "Login Failed")
+                    inProgress.value = false
+                }
+            }
+            .addOnFailureListener { exc ->
+                handleException(exc, "Login Failed")
+                inProgress.value = false
+            }
     }
 
     private fun createOrUpdateProfile(
@@ -85,8 +113,8 @@ class IgViewModel @Inject constructor(
                                 this.userData.value = userData
                                 inProgress.value = false
                             }
-                            .addOnFailureListener {
-                                handleException(it, "Cannot update user")
+                            .addOnFailureListener { exc ->
+                                handleException(exc, "Cannot update user")
                                 inProgress.value = false
                             }
                     } else {
