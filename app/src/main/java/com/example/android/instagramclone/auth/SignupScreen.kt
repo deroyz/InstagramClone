@@ -26,14 +26,16 @@ import androidx.navigation.NavController
 import com.example.android.instagramclone.DestinationScreen
 import com.example.android.instagramclone.IgViewModel
 import com.example.android.instagramclone.R
+import com.example.android.instagramclone.main.CheckSignedIn
 import com.example.android.instagramclone.main.CommonProgressSpinner
 import com.example.android.instagramclone.main.navigateTo
 
 @Composable
 fun SignupScreen(navController: NavController, vm: IgViewModel) {
 
-    val focus = LocalFocusManager.current
+    CheckSignedIn(vm = vm, navController = navController)
 
+    val focus = LocalFocusManager.current
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -45,7 +47,6 @@ fun SignupScreen(navController: NavController, vm: IgViewModel) {
             val usernameState = remember { mutableStateOf(TextFieldValue()) }
             val emailState = remember { mutableStateOf(TextFieldValue()) }
             val passState = remember { mutableStateOf(TextFieldValue()) }
-
             Image(
                 painter = painterResource(id = R.drawable.ig_logo),
                 contentDescription = null,
@@ -54,28 +55,24 @@ fun SignupScreen(navController: NavController, vm: IgViewModel) {
                     .padding(top = 16.dp)
                     .padding(8.dp)
             )
-
             Text(
                 text = "Signup",
                 modifier = Modifier.padding(8.dp),
                 fontSize = 30.sp,
                 fontFamily = FontFamily.SansSerif
             )
-
             OutlinedTextField(
                 value = usernameState.value,
                 onValueChange = { usernameState.value = it },
                 modifier = Modifier.padding(8.dp),
                 label = { Text(text = "Username") }
             )
-
             OutlinedTextField(
                 value = emailState.value,
                 onValueChange = { emailState.value = it },
                 modifier = Modifier.padding(8.dp),
                 label = { Text(text = "Email") }
             )
-
             OutlinedTextField(
                 value = passState.value,
                 onValueChange = { passState.value = it },
@@ -83,7 +80,6 @@ fun SignupScreen(navController: NavController, vm: IgViewModel) {
                 label = { Text(text = "Password") },
                 visualTransformation = PasswordVisualTransformation()
             )
-
             Button(
                 onClick = {
                     focus.clearFocus(force = true)
@@ -97,7 +93,6 @@ fun SignupScreen(navController: NavController, vm: IgViewModel) {
             ) {
                 Text(text = "SIGN UP")
             }
-
             Text(
                 text = "Already a user? Go to login ->",
                 color = Color.Blue,
@@ -107,9 +102,7 @@ fun SignupScreen(navController: NavController, vm: IgViewModel) {
                         navigateTo(navController, DestinationScreen.Login)
                     }
             )
-
         }
-
         val isLoading = vm.inProgress.value
         if (isLoading) {
             CommonProgressSpinner()

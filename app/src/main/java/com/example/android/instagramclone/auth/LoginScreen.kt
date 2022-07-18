@@ -26,11 +26,14 @@ import androidx.navigation.NavController
 import com.example.android.instagramclone.DestinationScreen
 import com.example.android.instagramclone.IgViewModel
 import com.example.android.instagramclone.R
+import com.example.android.instagramclone.main.CheckSignedIn
 import com.example.android.instagramclone.main.CommonProgressSpinner
 import com.example.android.instagramclone.main.navigateTo
 
 @Composable
 fun LoginScreen(navController: NavController, vm: IgViewModel) {
+
+    CheckSignedIn(vm = vm, navController = navController)
 
     val focus = LocalFocusManager.current
 
@@ -46,7 +49,6 @@ fun LoginScreen(navController: NavController, vm: IgViewModel) {
         ) {
             val emailState = remember { mutableStateOf(TextFieldValue()) }
             val passState = remember { mutableStateOf(TextFieldValue()) }
-
             Image(
                 painter = painterResource(id = R.drawable.ig_logo),
                 contentDescription = null,
@@ -82,7 +84,6 @@ fun LoginScreen(navController: NavController, vm: IgViewModel) {
             ) {
                 Text(text = "LOGIN")
             }
-
             Text(
                 text = "New here? Go to signup ->",
                 color = Color.Blue,
@@ -93,7 +94,6 @@ fun LoginScreen(navController: NavController, vm: IgViewModel) {
                     }
             )
         }
-
         val isLoading = vm.inProgress.value
         if (isLoading) {
             CommonProgressSpinner()
