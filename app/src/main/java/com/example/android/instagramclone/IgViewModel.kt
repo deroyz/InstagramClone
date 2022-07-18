@@ -53,10 +53,10 @@ class IgViewModel @Inject constructor(
                             }
                             inProgress.value = false
                         }
+                        .addOnFailureListener { }
                 }
             }
-            .addOnFailureListener {
-            }
+            .addOnFailureListener { }
     }
 
     private fun createOrUpdateProfile(
