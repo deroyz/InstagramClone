@@ -27,7 +27,7 @@ class IgViewModel @Inject constructor(
     val popupNotification = mutableStateOf<Event<String>?>(null)
 
     init {
-        auth.signOut()
+//        auth.signOut()
         val currentUser = auth.currentUser
         signedIn.value = currentUser != null
         currentUser?.uid?.let { uid ->
@@ -74,7 +74,7 @@ class IgViewModel @Inject constructor(
                 if (task.isSuccessful) {
                     signedIn.value = true
                     inProgress.value = false
-                    handleException(customMessage = "Login success")
+//                    handleException(customMessage = "Login success")
                     auth.currentUser?.uid?.let { uid -> getUserData(uid) }
                 } else {
                     handleException(task.exception, "Login Failed")
