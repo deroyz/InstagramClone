@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.android.instagramclone.IgViewModel
 import com.example.android.instagramclone.R
+import com.example.android.instagramclone.main.CommonProgressSpinner
 
 @Composable
 fun SignupScreen(navController: NavController, vm: IgViewModel) {
@@ -98,6 +99,11 @@ fun SignupScreen(navController: NavController, vm: IgViewModel) {
                     .clickable { }
             )
 
+        }
+
+        val isLoading = vm.inProgress.value
+        if (isLoading) {
+            CommonProgressSpinner()
         }
     }
 }
