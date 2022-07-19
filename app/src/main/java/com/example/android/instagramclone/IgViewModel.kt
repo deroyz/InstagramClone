@@ -181,4 +181,11 @@ class IgViewModel @Inject constructor(
             createOrUpdateProfile(imageUrl = it.toString())
         }
     }
+
+    fun onLogout(){
+        auth.signOut()
+        signedIn.value = false
+        userData.value = null
+        popupNotification.value = Event("Logged out")
+    }
 }

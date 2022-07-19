@@ -52,7 +52,10 @@ fun ProfileScreen(navController: NavController, vm: IgViewModel) {
             onBioChanged = { bio = it },
             onSave = { vm.updateProfileData(name, username, bio) },
             onBack = { navigateTo(navController, DestinationScreen.MyPosts) },
-            onLogout = { }
+            onLogout = {
+                vm.onLogout()
+                navigateTo(navController, DestinationScreen.Login)
+            }
         )
     }
 }
@@ -172,7 +175,7 @@ fun ProfileImage(imageUrl: String?, vm: IgViewModel) {
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) {uri: Uri? ->
+    ) { uri: Uri? ->
         uri?.let { vm.uploadProfileImage(uri) }
     }
 
@@ -181,7 +184,7 @@ fun ProfileImage(imageUrl: String?, vm: IgViewModel) {
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()
-                .clickable { launcher.launch("image/*")},
+                .clickable { launcher.launch("image/*") },
             horizontalAlignment = Alignment.CenterHorizontally
         )
         {
