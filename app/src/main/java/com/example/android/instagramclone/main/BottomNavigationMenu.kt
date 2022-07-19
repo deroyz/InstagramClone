@@ -17,7 +17,7 @@ import com.example.android.instagramclone.R
 
 enum class BottomNavigationItem(val icon: Int, val navDestination: DestinationScreen) {
     FEED(R.drawable.ic_home, DestinationScreen.Feed),
-    SEARCH(R.drawable.ic_home, DestinationScreen.Search),
+    SEARCH(R.drawable.ic_search, DestinationScreen.Search),
     POSTS(R.drawable.ic_posts, DestinationScreen.MyPosts)
 }
 
@@ -30,7 +30,7 @@ fun BottomNavigationMenu(selectedItem: BottomNavigationItem, navController: NavC
             .padding(top = 4.dp)
             .background(color = Color.White)
     ) {
-        for (item in BottomNavigationItem.values()) {
+                for (item in BottomNavigationItem.values()) {
             Image(
                 painter = painterResource(id = item.icon),
                 contentDescription = null,

@@ -68,6 +68,7 @@ fun LoginScreen(navController: NavController, vm: IgViewModel) {
                 onValueChange = { emailState.value = it },
                 modifier = Modifier.padding(8.dp),
                 label = { Text(text = "Email") })
+
             OutlinedTextField(
                 value = passState.value,
                 onValueChange = { passState.value = it },

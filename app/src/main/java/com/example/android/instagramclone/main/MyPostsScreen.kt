@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.android.instagramclone.DestinationScreen
 import com.example.android.instagramclone.IgViewModel
 import com.example.android.instagramclone.R
 
@@ -33,7 +34,9 @@ fun MyPostScreen(navController: NavController, vm: IgViewModel) {
     val isLoading = vm.inProgress.value
 
     Column {
+
         Column(modifier = Modifier.weight(1f)) {
+
             Row() {
                 ProfileImage(userData?.imageUrl) {
 
@@ -45,6 +48,7 @@ fun MyPostScreen(navController: NavController, vm: IgViewModel) {
                         .align(Alignment.CenterVertically),
                     textAlign = TextAlign.Center
                 )
+
                 Text(
                     text = "55\nfollowers",
                     modifier = Modifier
@@ -52,6 +56,7 @@ fun MyPostScreen(navController: NavController, vm: IgViewModel) {
                         .align(Alignment.CenterVertically),
                     textAlign = TextAlign.Center
                 )
+
                 Text(
                     text = "93\nfollowing",
                     modifier = Modifier
@@ -60,6 +65,7 @@ fun MyPostScreen(navController: NavController, vm: IgViewModel) {
                     textAlign = TextAlign.Center
                 )
             }
+
             Column(modifier = Modifier.padding(8.dp)) {
                 val usernameDisplay =
                     if (userData?.username == null) "" else "@${userData.username}"
@@ -67,8 +73,9 @@ fun MyPostScreen(navController: NavController, vm: IgViewModel) {
                 Text(text = usernameDisplay)
                 Text(text = userData?.bio ?: "")
             }
+
             OutlinedButton(
-                onClick = { },
+                onClick = { navigateTo(navController, DestinationScreen.Profile) },
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
@@ -82,9 +89,11 @@ fun MyPostScreen(navController: NavController, vm: IgViewModel) {
             ) {
                 Text(text = "Edit Profile", color = Color.Black)
             }
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = "Posts list")
             }
+
         }
 
 
@@ -94,7 +103,7 @@ fun MyPostScreen(navController: NavController, vm: IgViewModel) {
         )
     }
 
-    if(isLoading){
+    if (isLoading) {
         CommonProgressSpinner()
     }
 }
