@@ -40,6 +40,9 @@ sealed class DestinationScreen(val route: String) {
     object Search : DestinationScreen("search")
     object MyPosts : DestinationScreen("myposts")
     object Profile : DestinationScreen("profile")
+    object NewPost : DestinationScreen("newpost/{imageUri}"){
+        fun createRoute(uri: String) = "newpost/$uri"
+    }
 }
 
 @Composable
@@ -50,35 +53,29 @@ fun InstagramApp() {
     NotificationMessage(vm = vm)
 
     NavHost(navController = navController, startDestination = DestinationScreen.Signup.route) {
-
         composable(DestinationScreen.Signup.route) {
             SignupScreen(navController = navController, vm = vm)
         }
-
         composable(DestinationScreen.Login.route) {
             LoginScreen(navController = navController, vm = vm)
         }
-
         composable(DestinationScreen.Feed.route) {
             FeedScreen(navController = navController, vm = vm)
         }
-
         composable(DestinationScreen.Search.route) {
             SearchScreen(navController = navController, vm = vm)
         }
-
         composable(DestinationScreen.MyPosts.route) {
             MyPostScreen(navController = navController, vm = vm)
         }
-
         composable(DestinationScreen.Profile.route) {
             ProfileScreen(navController = navController, vm = vm)
         }
-
+        composable(DestinationScreen.NewPost.route) { navBackStackEntry ->
+            val imageUri = navBackStackEntry.arguments?.getString("imageUri")
+            imageUri?.let { NewPostScreen(navController = navController, vm = vm, encodedUri = it) }
+        }
     }
-
-
-
 }
 
 @Preview(showBackground = true)
