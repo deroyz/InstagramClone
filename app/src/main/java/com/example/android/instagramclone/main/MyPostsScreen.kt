@@ -38,9 +38,11 @@ fun MyPostScreen(navController: NavController, vm: IgViewModel) {
         Column(modifier = Modifier.weight(1f)) {
 
             Row() {
+
                 ProfileImage(userData?.imageUrl) {
 
                 }
+
                 Text(
                     text = "15\nposts",
                     modifier = Modifier
@@ -114,11 +116,13 @@ fun ProfileImage(imageUrl: String?, onClick: () -> Unit) {
     Box(modifier = Modifier
         .clickable { onClick.invoke() }
         .padding(top = 16.dp)) {
+
         UserImageCard(
             userImage = imageUrl, modifier = Modifier
                 .padding(8.dp)
                 .size(80.dp)
         )
+
         Card(
             shape = CircleShape,
             border = BorderStroke(
