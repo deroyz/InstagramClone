@@ -218,12 +218,13 @@ class IgViewModel @Inject constructor(
                 userImage = currentUserImage,
                 postImage = imageUri.toString(),
                 postDescription = description,
-                time = System.currentTimeMillis()
+                time = System.currentTimeMillis(),
             )
 
-            db.collection(POSTS).document().set(post)
+            db.collection(POSTS).document(postUuid).set(post)
                 .addOnSuccessListener {
-                    popupNotification.value = Event("Post successfully created ")
+                    popupNotification.value = Event("Post successfully created")
+                    inProgress.value = false
                     refreshPosts()
                     onPostSuccess.invoke()
                 }
@@ -241,7 +242,7 @@ class IgViewModel @Inject constructor(
 
     private fun refreshPosts() {
         val currentUid = auth.currentUser?.uid
-        if (currentUid != null) {
+        if (currentUid != null ) {
             refreshPostsProgress.value = true
             db.collection(POSTS).whereEqualTo("userId", currentUid).get()
                 .addOnSuccessListener { documents ->
@@ -267,4 +268,5 @@ class IgViewModel @Inject constructor(
         val sortedPosts = newPosts.sortedByDescending { it.time }
         outState.value = sortedPosts
     }
+
 }
