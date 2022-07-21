@@ -221,6 +221,7 @@ class IgViewModel @Inject constructor(
                 postImage = imageUri.toString(),
                 postDescription = description,
                 time = System.currentTimeMillis(),
+                likes = listOf<String>()
             )
 
             db.collection(POSTS).document(postUuid).set(post)
@@ -244,7 +245,7 @@ class IgViewModel @Inject constructor(
 
     private fun refreshPosts() {
         val currentUid = auth.currentUser?.uid
-        if (currentUid != null ) {
+        if (currentUid != null) {
             refreshPostsProgress.value = true
             db.collection(POSTS).whereEqualTo("userId", currentUid).get()
                 .addOnSuccessListener { documents ->
