@@ -44,7 +44,6 @@ sealed class DestinationScreen(val route: String) {
     object NewPost : DestinationScreen("newpost/{imageUri}") {
         fun createRoute(uri: String) = "newpost/$uri"
     }
-
     object SinglePost : DestinationScreen("singlepost")
 }
 
