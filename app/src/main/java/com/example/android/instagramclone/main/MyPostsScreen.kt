@@ -124,22 +124,20 @@ fun MyPostScreen(navController: NavController, vm: IgViewModel) {
                 Text(text = "Edit Profile", color = Color.Black)
             }
 
-            Column(modifier = Modifier.weight(1f)) {
-                PostList(
-                    isContextLoading = isLoading,
-                    postsLoading = postsLoading,
-                    posts = posts,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(1.dp)
-                        .fillMaxSize()
-                ) { post ->
-                    navigateTo(
-                        navController = navController,
-                        DestinationScreen.SinglePost,
-                        NavParam("post", post)
-                    )
-                }
+            PostList(
+                isContextLoading = isLoading,
+                postsLoading = postsLoading,
+                posts = posts,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(1.dp)
+                    .fillMaxSize()
+            ) { post ->
+                navigateTo(
+                    navController = navController,
+                    DestinationScreen.SinglePost,
+                    NavParam("post", post)
+                )
             }
         }
 
