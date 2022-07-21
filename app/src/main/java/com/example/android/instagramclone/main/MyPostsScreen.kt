@@ -133,8 +133,12 @@ fun MyPostScreen(navController: NavController, vm: IgViewModel) {
                         .weight(1f)
                         .padding(1.dp)
                         .fillMaxSize()
-                ){
-
+                ) { post ->
+                    navigateTo(
+                        navController = navController,
+                        DestinationScreen.SinglePost,
+                        NavParam("post", post)
+                    )
                 }
             }
         }
