@@ -1,23 +1,122 @@
 package com.example.android.instagramclone.main
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import android.graphics.Paint
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.android.instagramclone.DestinationScreen
 import com.example.android.instagramclone.IgViewModel
+import com.example.android.instagramclone.data.PostData
 
 @Composable
 
 fun FeedScreen(navController: NavController, vm: IgViewModel) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = "Feed screen")
+
+    val userDataLoading = vm.inProgress.value
+    val userData = vm.userData.value
+    val personalizedFeed = vm.postsFeed.value
+    val personalizedFeedLoading = vm.postsFeedProgress.value
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.LightGray)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .background(Color.White)
+        ) {
+            UserImageCard(userImage = userData?.imageUrl)
         }
+        PostList(
+            posts = personalizedFeed,
+            modifier = Modifier.weight(1f),
+            loading = personalizedFeedLoading or userDataLoading,
+            navController = navController,
+            vm = vm,
+            currentUserId = userData?.userId ?: ""
+        )
+
         BottomNavigationMenu(
             selectedItem = BottomNavigationItem.FEED,
             navController = navController
         )
+    }
+}
+
+@Composable
+fun PostList(
+    posts: List<PostData>,
+    modifier: Modifier,
+    loading: Boolean,
+    navController: NavController,
+    vm: IgViewModel,
+    currentUserId: String
+) {
+    Box(modifier = modifier) {
+        LazyColumn() {
+            items(items = posts) {
+                Post(post = it, currentUserId = currentUserId, vm) {
+                    navigateTo(
+                        navController, DestinationScreen.SinglePost, NavParam("post", it)
+                    )
+                }
+            }
+        }
+        if (loading)
+            CommonProgressSpinner()
+    }
+}
+
+@Composable
+fun Post(post: PostData, currentUserId: String, vm: IgViewModel, onPostClick: () -> Unit) {
+    Card(
+        shape = RoundedCornerShape(corner = CornerSize(4.dp)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(top = 4.dp, bottom = 4.dp)
+    ) {
+        Column() {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Card(
+                    shape = CircleShape, modifier = Modifier
+                        .padding(4.dp)
+                        .size(32.dp)
+                ) {
+                    CommonImage(data = post.userImage, contentScale = ContentScale.Crop)
+                }
+                Text(text = post.username ?: "", modifier = Modifier.padding(4.dp))
+            }
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                val modifier = Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = 150.dp)
+                CommonImage(data = post.postImage, modifier = modifier, contentScale = ContentScale.FillWidth)
+            }
+        }
     }
 }
