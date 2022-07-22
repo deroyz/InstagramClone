@@ -18,6 +18,7 @@ import com.example.android.instagramclone.data.PostData
 import com.example.android.instagramclone.main.*
 import com.example.android.instagramclone.ui.theme.InstagramCloneTheme
 import dagger.hilt.android.AndroidEntryPoint
+import org.w3c.dom.Comment
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -44,7 +45,11 @@ sealed class DestinationScreen(val route: String) {
     object NewPost : DestinationScreen("newpost/{imageUri}") {
         fun createRoute(uri: String) = "newpost/$uri"
     }
+
     object SinglePost : DestinationScreen("singlepost")
+    object CommentsScreen : DestinationScreen("commentsscreen/{postId}") {
+        fun createRoute(postId: String) = "comments/$postId"
+    }
 }
 
 @Composable
@@ -88,8 +93,16 @@ fun InstagramApp() {
                 )
             }
         }
+
+        composable(DestinationScreen.CommentsScreen.route) { navBackStackEntry ->
+            val postId = navBackStackEntry.arguments?.getString("postId")
+            postId?.let{
+                CommentsScreen(navController = navController, vm = vm, postId = postId)
+            }
+        }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
