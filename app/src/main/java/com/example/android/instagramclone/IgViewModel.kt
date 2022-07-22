@@ -35,6 +35,9 @@ class IgViewModel @Inject constructor(
     val refreshPostsProgress = mutableStateOf(false)
     val posts = mutableStateOf<List<PostData>>(listOf())
 
+    val searchedPosts = mutableStateOf<List<PostData>>(listOf())
+    val searchedPostsProgress = mutableStateOf(false)
+
     init {
 //        auth.signOut()
         val currentUser = auth.currentUser
@@ -219,8 +222,8 @@ class IgViewModel @Inject constructor(
             val fillerWords = listOf("the", "be", "to", "is", "of", "and", "or", "a", "in", "it")
             val searchTerms = description
                 .split(" ", ".", ",", "?", "!", "#")
-                .map{it.lowercase()}
-                .filter { it.isNotEmpty() and !fillerWords.contains(it)}
+                .map { it.lowercase() }
+                .filter { it.isNotEmpty() and !fillerWords.contains(it) }
 
 
             val post = PostData(
@@ -281,6 +284,22 @@ class IgViewModel @Inject constructor(
         }
         val sortedPosts = newPosts.sortedByDescending { it.time }
         outState.value = sortedPosts
+    }
+
+    fun searchPosts(searchTerm: String) {
+        if (searchTerm.isNotEmpty()) {
+            searchedPostsProgress.value = true
+            db.collection(POSTS).whereArrayContains("searchTerms", searchTerm.trim().lowercase())
+                .get()
+                .addOnSuccessListener {
+                    convertPosts(it, searchedPosts)
+                    searchedPostsProgress.value = false
+                }
+                .addOnFailureListener {  exc ->
+                    handleException(exc, "Cannot search posts")
+                    searchedPostsProgress.value = false
+                }
+        }
     }
 
 }
