@@ -8,7 +8,6 @@ import com.example.android.instagramclone.data.Event
 import com.example.android.instagramclone.data.PostData
 import com.example.android.instagramclone.data.UserData
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.toObject
@@ -55,15 +54,10 @@ class IgViewModel @Inject constructor(
         inProgress.value = true
 
         db.collection(USERS).whereEqualTo("username", username).get()
-
             .addOnSuccessListener { documents ->
-
-                // if username already exist (username matches in document >0)
                 if (documents.size() > 0) {
                     handleException(customMessage = "Username already exist")
                     inProgress.value = false
-
-                    // in the process of creating account using email and password
                 } else {
                     auth.createUserWithEmailAndPassword(email, pass)
                         .addOnCompleteListener { task ->
@@ -77,7 +71,6 @@ class IgViewModel @Inject constructor(
                         }
                 }
             }
-            // failed to get the document from Firebase
             .addOnFailureListener { }
     }
 
@@ -148,28 +141,16 @@ class IgViewModel @Inject constructor(
     }
 
     private fun getUserData(uid: String) {
-        // Update progress status
         inProgress.value = true
-
-        // Get database document with userid from users collection from FirebaseStore
         db.collection(USERS).document(uid).get()
             .addOnSuccessListener {
-
-                // Converts received Data into UserData object
                 val user = it.toObject<UserData>()
                 userData.value = user
-
-                // refresh the posts with loaded data from FirebaseStroe
-                refreshPosts()
-                // Update progress status
                 inProgress.value = false
+                refreshPosts()
             }
-
-            // Fails to retrieve user data from FirebaseStore with userid
             .addOnFailureListener { exc ->
                 handleException(exc, "Cannot retrieve user data")
-
-                // Update progress status
                 inProgress.value = false
             }
     }
@@ -207,37 +188,7 @@ class IgViewModel @Inject constructor(
     fun uploadProfileImage(uri: Uri) {
         uploadImage(uri) {
             createOrUpdateProfile(imageUrl = it.toString())
-            updatePostUserImageData(it.toString())
         }
-    }
-
-    private fun updatePostUserImageData(imageUrl: String) {
-        val currentUid = auth.currentUser?.uid
-        db.collection(POSTS).whereEqualTo("usderId", currentUid).get()
-            .addOnSuccessListener {
-
-                val posts = mutableStateOf<List<PostData>>(arrayListOf())
-                convertPosts(it, posts)
-
-                val refs = arrayListOf<DocumentReference>()
-
-                for (post in posts.value) {
-                    post.postId?.let { id ->
-                        refs.add(db.collection(POSTS).document())
-                    }
-                }
-
-                if (refs.isNotEmpty()) {
-                    db.runBatch() { batch ->
-                        for(ref in refs){
-                            batch.update(ref, "userImage", imageUrl)
-                        }
-                    }
-                        .addOnSuccessListener {
-                            refreshPosts()
-                        }
-                }
-            }
     }
 
     fun onLogout() {
@@ -254,7 +205,9 @@ class IgViewModel @Inject constructor(
     }
 
     private fun onCreatePost(imageUri: Uri, description: String, onPostSuccess: () -> Unit) {
+
         inProgress.value = true
+
         val currentUid = auth.currentUser?.uid
         val currentUsername = userData.value?.username
         val currentUserImage = userData.value?.imageUrl
@@ -262,6 +215,14 @@ class IgViewModel @Inject constructor(
         if (currentUid != null) {
 
             val postUuid = UUID.randomUUID().toString()
+
+            val fillerWords = listOf("the", "be", "to", "is", "of", "and", "or", "a", "in", "it")
+            val searchTerms = description
+                .split(" ", ".", ",", "?", "!", "#")
+                .map{it.lowercase()}
+                .filter { it.isNotEmpty() and !fillerWords.contains(it)}
+
+
             val post = PostData(
                 postId = postUuid,
                 userId = currentUid,
@@ -270,7 +231,8 @@ class IgViewModel @Inject constructor(
                 postImage = imageUri.toString(),
                 postDescription = description,
                 time = System.currentTimeMillis(),
-                likes = listOf<String>()
+                likes = listOf<String>(),
+                searchTerms = searchTerms
             )
 
             db.collection(POSTS).document(postUuid).set(post)
@@ -312,14 +274,11 @@ class IgViewModel @Inject constructor(
     }
 
     private fun convertPosts(documents: QuerySnapshot, outState: MutableState<List<PostData>>) {
-
         val newPosts = mutableListOf<PostData>()
-
         documents.forEach { doc ->
             val post = doc.toObject<PostData>()
             newPosts.add(post)
         }
-
         val sortedPosts = newPosts.sortedByDescending { it.time }
         outState.value = sortedPosts
     }
