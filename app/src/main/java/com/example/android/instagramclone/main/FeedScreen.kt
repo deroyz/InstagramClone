@@ -2,6 +2,7 @@ package com.example.android.instagramclone.main
 
 import android.graphics.Paint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,15 +12,23 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.android.instagramclone.DestinationScreen
 import com.example.android.instagramclone.IgViewModel
 import com.example.android.instagramclone.data.PostData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 
 @Composable
 
@@ -85,6 +94,10 @@ fun PostList(
 
 @Composable
 fun Post(post: PostData, currentUserId: String, vm: IgViewModel, onPostClick: () -> Unit) {
+
+    val likeAnimation = remember { mutableStateOf(false) }
+    val dislikeAnimation = remember { mutableStateOf(false) }
+
     Card(
         shape = RoundedCornerShape(corner = CornerSize(4.dp)),
         modifier = Modifier
@@ -115,7 +128,39 @@ fun Post(post: PostData, currentUserId: String, vm: IgViewModel, onPostClick: ()
                 val modifier = Modifier
                     .fillMaxWidth()
                     .defaultMinSize(minHeight = 150.dp)
-                CommonImage(data = post.postImage, modifier = modifier, contentScale = ContentScale.FillWidth)
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onDoubleTap = {
+                                if (post.likes?.contains(currentUserId) == true) {
+                                    dislikeAnimation.value = true
+                                } else {
+                                    likeAnimation.value = true
+                                }
+                                vm.onLikePost(post)
+                            },
+                            onTap = {
+                                onPostClick.invoke()
+                            })
+                    }
+                CommonImage(
+                    data = post.postImage,
+                    modifier = modifier,
+                    contentScale = ContentScale.FillWidth
+                )
+                if (likeAnimation.value) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        delay(1000L)
+                        likeAnimation.value = false
+                    }
+                    LikeAnimation()
+                }
+                if (dislikeAnimation.value) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        delay(1000L)
+                        likeAnimation.value = false
+                    }
+                    LikeAnimation(false)
+                }
             }
         }
     }
