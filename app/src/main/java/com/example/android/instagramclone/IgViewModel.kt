@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.example.android.instagramclone.data.CommentData
 import com.example.android.instagramclone.data.Event
 import com.example.android.instagramclone.data.PostData
 import com.example.android.instagramclone.data.UserData
@@ -19,6 +20,7 @@ import kotlin.Exception
 
 const val USERS = "users"
 const val POSTS = "posts"
+const val COMMENTS = "comments"
 
 @HiltViewModel
 class IgViewModel @Inject constructor(
@@ -40,6 +42,9 @@ class IgViewModel @Inject constructor(
 
     val postsFeed = mutableStateOf<List<PostData>>(listOf())
     val postsFeedProgress = mutableStateOf(false)
+
+    val comments = mutableStateOf<List<CommentData>>(listOf())
+    val commentsProgress = mutableStateOf(false)
 
     init {
 //        auth.signOut()
@@ -199,12 +204,20 @@ class IgViewModel @Inject constructor(
     }
 
     fun onLogout() {
+        // Logout from Firbase authentication
         auth.signOut()
+
+        //  Let view model knows logged out
         signedIn.value = false
         userData.value = null
+
+        // Message notify logout
         popupNotification.value = Event("Logged out")
+
+        // Clear all the data sets related to user logged out
         searchedPosts.value = listOf()
         postsFeed.value = listOf()
+        comments.value = listOf()
     }
 
     fun onNewPost(uri: Uri, description: String, onPostSuccess: () -> Unit) {
@@ -390,11 +403,32 @@ class IgViewModel @Inject constructor(
                         .addOnSuccessListener {
                             postData.likes = newLikes
                         }
-                        .addOnFailureListener { exc->
+                        .addOnFailureListener { exc ->
                             handleException(exc, "Unable to like post")
                         }
                 }
             }
+        }
+    }
+
+    fun createComment(postId: String, text: String) {
+        userData.value?.username?.let { username ->
+            val commentId = UUID.randomUUID().toString()
+            val comment = CommentData(
+                commentId = commentId,
+                postId = postId,
+                username = username,
+                text = text,
+                timestap = System.currentTimeMillis()
+            )
+
+            db.collection(COMMENTS).document(commentId).set(comment)
+                .addOnSuccessListener {
+                    // Get existing comments
+                }
+                .addOnFailureListener { exc->
+                    handleException(exc, "Cannot create comment.")
+                }
         }
     }
 }
