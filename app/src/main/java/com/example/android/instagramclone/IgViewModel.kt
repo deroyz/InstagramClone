@@ -199,6 +199,7 @@ class IgViewModel @Inject constructor(
         signedIn.value = false
         userData.value = null
         popupNotification.value = Event("Logged out")
+        searchedPosts.value = listOf()
     }
 
     fun onNewPost(uri: Uri, description: String, onPostSuccess: () -> Unit) {
@@ -295,11 +296,28 @@ class IgViewModel @Inject constructor(
                     convertPosts(it, searchedPosts)
                     searchedPostsProgress.value = false
                 }
-                .addOnFailureListener {  exc ->
+                .addOnFailureListener { exc ->
                     handleException(exc, "Cannot search posts")
                     searchedPostsProgress.value = false
                 }
         }
     }
 
+    fun onFollowClick(userId: String) {
+        auth.currentUser?.uid?.let { currentUser ->
+            val following = arrayListOf<String>()
+            userData.value?.following?.let {
+                following.addAll(it)
+            }
+            if (following.contains(userId)) {
+                following.remove(userId)
+            } else {
+                following.add(userId)
+            }
+            db.collection(USERS).document(currentUser).update("following", following)
+                .addOnSuccessListener {
+                    getUserData(currentUser)
+                }
+        }
+    }
 }
