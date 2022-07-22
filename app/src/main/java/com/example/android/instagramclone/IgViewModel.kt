@@ -351,7 +351,7 @@ class IgViewModel @Inject constructor(
                     handleException(exc, "Cannot get personlized feed")
                     postsFeedProgress.value = false
                 }
-        //  Case user has no followings
+            //  Case user has no followings
         } else {
             getGeneralFeed()
         }
@@ -373,5 +373,28 @@ class IgViewModel @Inject constructor(
                 handleException(exc, "Cannot get feed")
                 postsFeedProgress.value = false
             }
+    }
+
+    fun onLikePost(postData: PostData) {
+        auth.currentUser?.uid?.let { userId ->
+            postData.likes?.let { likes ->
+                val newLikes = arrayListOf<String>()
+                if (likes.contains(userId)) {
+                    newLikes.addAll(likes.filter { userId != it })
+                } else {
+                    newLikes.addAll(likes)
+                    newLikes.add(userId)
+                }
+                postData.postId?.let { postId ->
+                    db.collection(POSTS).document(postId).update("lieks", newLikes)
+                        .addOnSuccessListener {
+                            postData.likes = newLikes
+                        }
+                        .addOnFailureListener { exc->
+                            handleException(exc, "Unable to like post")
+                        }
+                }
+            }
+        }
     }
 }

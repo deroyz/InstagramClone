@@ -76,7 +76,7 @@ fun CheckSignedIn(vm: IgViewModel, navController: NavController) {
     val signedIn = vm.signedIn.value
     if (signedIn && !alreadyLoggedIn.value) {
         alreadyLoggedIn.value = true
-        navController.navigate(DestinationScreen.MyPosts.route) {
+        navController.navigate(DestinationScreen.Feed.route) {
             popUpTo(0)
         }
     }
