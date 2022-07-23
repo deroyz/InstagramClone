@@ -425,10 +425,37 @@ class IgViewModel @Inject constructor(
             db.collection(COMMENTS).document(commentId).set(comment)
                 .addOnSuccessListener {
                     // Get existing comments
+                    getComments(postId)
                 }
-                .addOnFailureListener { exc->
+                .addOnFailureListener { exc ->
                     handleException(exc, "Cannot create comment.")
                 }
         }
+    }
+
+    fun getComments(postId: String?) {
+        // Update comment loading progress
+        commentsProgress.value = true
+
+        // Get comments for specific postId from "comments" collection in FirebaseStore
+        db.collection(COMMENTS).whereEqualTo("postId", postId).get()
+            .addOnSuccessListener { documents ->
+                val newComments = mutableListOf<CommentData>()
+
+                // Get each comment to convert into type CommentData
+                documents.forEach { doc ->
+                    val comment = doc.toObject<CommentData>()
+                    // Add each comment in newComments of mutable list
+                    newComments.add(comment)
+                }
+                // Sort all the comments by time descending
+                val sortedComments = newComments.sortedByDescending { it.timestap }
+                commentsProgress.value = false
+            }
+            .addOnFailureListener { exc ->
+                // Handles exception of failure of retrieving comments from FirebaseStore
+                handleException(exc, "Cannot retrieve comments")
+                commentsProgress.value = false
+            }
     }
 }
