@@ -210,7 +210,9 @@ fun PostList(
 
             val rows = arrayListOf<PostRow>()
             var currentRow = PostRow()
+
             rows.add(currentRow)
+
             for (post in posts) {
                 if (currentRow.isFull()) {
                     currentRow = PostRow()

@@ -42,11 +42,13 @@ sealed class DestinationScreen(val route: String) {
     object Search : DestinationScreen("search")
     object MyPosts : DestinationScreen("myposts")
     object Profile : DestinationScreen("profile")
+
+    object SinglePost : DestinationScreen("singlepost")
+
     object NewPost : DestinationScreen("newpost/{imageUri}") {
         fun createRoute(uri: String) = "newpost/$uri"
     }
 
-    object SinglePost : DestinationScreen("singlepost")
     object CommentsScreen : DestinationScreen("commentsscreen/{postId}") {
         fun createRoute(postId: String) = "comments/$postId"
     }
@@ -78,13 +80,11 @@ fun InstagramApp() {
         composable(DestinationScreen.Profile.route) {
             ProfileScreen(navController = navController, vm = vm)
         }
-        composable(DestinationScreen.NewPost.route) { navBackStackEntry ->
-            val imageUri = navBackStackEntry.arguments?.getString("imageUri")
-            imageUri?.let { NewPostScreen(navController = navController, vm = vm, encodedUri = it) }
-        }
+
         composable(DestinationScreen.SinglePost.route) {
             val postData =
                 navController.previousBackStackEntry?.arguments?.getParcelable<PostData>("post")
+
             postData?.let {
                 SinglePostScreen(
                     navController = (navController),
@@ -92,13 +92,27 @@ fun InstagramApp() {
                     post = postData
                 )
             }
+
+        }
+
+        composable(DestinationScreen.NewPost.route) { navBackStackEntry ->
+
+            val imageUri = navBackStackEntry.arguments?.getString("imageUri")
+
+            imageUri?.let {
+                NewPostScreen(navController = navController, vm = vm, encodedUri = it)
+            }
+
         }
 
         composable(DestinationScreen.CommentsScreen.route) { navBackStackEntry ->
+
             val postId = navBackStackEntry.arguments?.getString("postId")
-            postId?.let{
+
+            postId?.let {
                 CommentsScreen(navController = navController, vm = vm, postId = postId)
             }
+
         }
     }
 }
