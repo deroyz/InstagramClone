@@ -78,7 +78,7 @@ fun MyPostScreen(navController: NavController, vm: IgViewModel) {
                 }
 
                 Text(
-                    text = "$posts.size\nposts",
+                    text = "${posts.size}\nposts}",
                     modifier = Modifier
                         .weight(1f)
                         .align(Alignment.CenterVertically),

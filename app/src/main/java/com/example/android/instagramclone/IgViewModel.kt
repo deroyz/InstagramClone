@@ -84,7 +84,10 @@ class IgViewModel @Inject constructor(
                         }
                 }
             }
-            .addOnFailureListener { }
+            .addOnFailureListener { exc ->
+                inProgress.value = false
+                handleException(exc, "Signup failed")
+            }
     }
 
     fun onLogin(email: String, pass: String) {
