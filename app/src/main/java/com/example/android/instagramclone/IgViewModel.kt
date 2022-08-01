@@ -387,6 +387,7 @@ class IgViewModel @Inject constructor(
             .get()
             .addOnSuccessListener {
                 convertPosts(documents = it, outState = postsFeed)
+                postsFeedProgress.value = false
             }
             .addOnFailureListener { exc ->
                 handleException(exc, "Cannot get feed")
