@@ -57,34 +57,50 @@ class IgViewModel @Inject constructor(
         }
     }
 
+    // Method for signup
     fun onSignup(username: String, email: String, pass: String) {
 
-        if (username.isEmpty() or email.isEmpty() || pass.isEmpty()) {
+        // Check if input field for user name or email or password is empty
+        if (username.isEmpty() || email.isEmpty() || pass.isEmpty()) {
             handleException(customMessage = "Please fill in all fields")
             return
         }
 
+        // If all the fields are filled, it goes into the signup process
         inProgress.value = true
 
+        // Attempt to get the user data from "USERS" collection on Firestore Database with input user name
         db.collection(USERS).whereEqualTo("username", username).get()
+
             .addOnSuccessListener { documents ->
+                // Case username already exist
                 if (documents.size() > 0) {
                     handleException(customMessage = "Username already exist")
+                    // Process done
                     inProgress.value = false
+
+                // Case input userdata does not exist
                 } else {
+                    // Create new user account with input email and password
                     auth.createUserWithEmailAndPassword(email, pass)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
+                                // Let ViewModel notice that it is signed in with signup attempted  username
                                 signedIn.value = true
+                                // Create new userdata with username and save to "USERS" collection on Firestore Database
                                 createOrUpdateProfile(username = username)
                             } else {
                                 handleException(task.exception, "Signup failed")
                             }
+                            // Process done
                             inProgress.value = false
                         }
                 }
             }
+
+            // Case not able to receive the document from database
             .addOnFailureListener { exc ->
+                // Process done
                 inProgress.value = false
                 handleException(exc, "Signup failed")
             }
@@ -133,6 +149,7 @@ class IgViewModel @Inject constructor(
         uid?.let { uid ->
             inProgress.value = true
             db.collection(USERS).document(uid).get()
+
                 .addOnSuccessListener {
                     if (it.exists()) {
                         it.reference.update(userData.toMap())
@@ -149,6 +166,7 @@ class IgViewModel @Inject constructor(
                         getUserData(uid)
                     }
                 }
+
                 .addOnFailureListener { exc ->
                     handleException(exc, "Cannot create user")
                     inProgress.value = false
@@ -159,6 +177,7 @@ class IgViewModel @Inject constructor(
     private fun getUserData(uid: String) {
         inProgress.value = true
         db.collection(USERS).document(uid).get()
+
             .addOnSuccessListener {
                 val user = it.toObject<UserData>()
                 userData.value = user
@@ -167,6 +186,7 @@ class IgViewModel @Inject constructor(
                 getPersonalizedFeed()
                 getFollowers(uid)
             }
+
             .addOnFailureListener { exc ->
                 handleException(exc, "Cannot retrieve user data")
                 inProgress.value = false
@@ -193,6 +213,7 @@ class IgViewModel @Inject constructor(
                 val result = it.metadata?.reference?.downloadUrl
                 result?.addOnSuccessListener(onSuccess)
             }
+
             .addOnFailureListener { exc ->
                 handleException(exc)
                 inProgress.value = false
