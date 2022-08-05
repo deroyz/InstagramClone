@@ -106,6 +106,7 @@ class IgViewModel @Inject constructor(
             }
     }
 
+    // Method for login
     fun onLogin(email: String, pass: String) {
         if (email.isEmpty() || pass.isEmpty()) {
             handleException(customMessage = "Please fill in all fields")
