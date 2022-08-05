@@ -83,6 +83,7 @@ class IgViewModel @Inject constructor(
                 } else {
                     // Create new user account with input email and password
                     auth.createUserWithEmailAndPassword(email, pass)
+                        // Inquiry creating account with email and password is complete (could be successful or not)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 // Let ViewModel notice that it is signed in with signup attempted  username
@@ -108,29 +109,44 @@ class IgViewModel @Inject constructor(
 
     // Method for login
     fun onLogin(email: String, pass: String) {
+        // Check if input fields(email and password) are empty
         if (email.isEmpty() || pass.isEmpty()) {
             handleException(customMessage = "Please fill in all fields")
             return
         }
+        // If fields are filled up properly start login process
         inProgress.value = true
+
+        // Sign in to Firebase Authentication using filled up information (email and password)
         auth.signInWithEmailAndPassword(email, pass)
+
+            // Inquiry signing in is complete (could be successful or not)
             .addOnCompleteListener { task ->
+                // Case signed in properly
                 if (task.isSuccessful) {
+                    // Sign in value turns to true
                     signedIn.value = true
+                    // Process done
                     inProgress.value = false
-//                    handleException(customMessage = "Login success")
+                    // Retrieve user data by calling getUserData method with uid on Firebase Authentication
                     auth.currentUser?.uid?.let { uid -> getUserData(uid) }
+                // Case sign in failed
                 } else {
                     handleException(task.exception, "Login Failed")
+                    // Process done
                     inProgress.value = false
                 }
             }
+
+            // Inquiry signing in failed
             .addOnFailureListener { exc ->
                 handleException(exc, "Login Failed")
+                // Process done
                 inProgress.value = false
             }
     }
 
+    // private function creating or updating profile (called from other methods in ViewModel)
     private fun createOrUpdateProfile(
         name: String? = null,
         username: String? = null,
@@ -175,8 +191,11 @@ class IgViewModel @Inject constructor(
         }
     }
 
+    // Private function to retrieve userdata from Firestore Database
     private fun getUserData(uid: String) {
+        // Process begin
         inProgress.value = true
+        // Retrieve user data from USERS collection on Firestore Database using UID
         db.collection(USERS).document(uid).get()
 
             .addOnSuccessListener {
@@ -187,7 +206,7 @@ class IgViewModel @Inject constructor(
                 getPersonalizedFeed()
                 getFollowers(uid)
             }
-
+            // Handle failure to retrieving data from Firestore Database
             .addOnFailureListener { exc ->
                 handleException(exc, "Cannot retrieve user data")
                 inProgress.value = false

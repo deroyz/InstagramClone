@@ -32,9 +32,9 @@ import com.example.android.instagramclone.main.navigateTo
 fun ProfileScreen(navController: NavController, vm: IgViewModel) {
 
     val isLoading = vm.inProgress.value
+
     if (isLoading) {
         CommonProgressSpinner()
-
     } else {
 
         val userData = vm.userData.value
