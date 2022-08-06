@@ -47,9 +47,11 @@ fun ProfileScreen(navController: NavController, vm: IgViewModel) {
             name = name,
             username = username,
             bio = bio,
+            // it -> value changed
             onNameChanged = { name = it },
             onUsernameChanged = { username = it },
             onBioChanged = { bio = it },
+            // On save button clicked calle update profile function in ViewModel with currently input data
             onSave = { vm.updateProfileData(name, username, bio) },
             onBack = { navigateTo(navController, DestinationScreen.MyPosts) },
             onLogout = {

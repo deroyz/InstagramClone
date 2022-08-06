@@ -33,6 +33,7 @@ import com.example.android.instagramclone.main.navigateTo
 @Composable
 fun LoginScreen(navController: NavController, vm: IgViewModel) {
 
+    // Composable function checking sign-in state
     CheckSignedIn(vm = vm, navController = navController)
 
     val focus = LocalFocusManager.current
@@ -79,6 +80,7 @@ fun LoginScreen(navController: NavController, vm: IgViewModel) {
             Button(
                 onClick = {
                     focus.clearFocus(force = true)
+                    // Login with email and password on outlined text fields
                     vm.onLogin(emailState.value.text, passState.value.text)
                 },
                 modifier = Modifier.padding(8.dp)
@@ -91,6 +93,7 @@ fun LoginScreen(navController: NavController, vm: IgViewModel) {
                 modifier = Modifier
                     .padding(8.dp)
                     .clickable {
+                        // Implemented navigate function
                         navigateTo(navController, DestinationScreen.Signup)
                     }
             )

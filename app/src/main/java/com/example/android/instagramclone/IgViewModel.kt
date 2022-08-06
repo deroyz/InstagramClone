@@ -79,7 +79,7 @@ class IgViewModel @Inject constructor(
                     // Process done
                     inProgress.value = false
 
-                // Case input userdata does not exist
+                    // Case input userdata does not exist
                 } else {
                     // Create new user account with input email and password
                     auth.createUserWithEmailAndPassword(email, pass)
@@ -130,7 +130,7 @@ class IgViewModel @Inject constructor(
                     inProgress.value = false
                     // Retrieve user data by calling getUserData method with uid on Firebase Authentication
                     auth.currentUser?.uid?.let { uid -> getUserData(uid) }
-                // Case sign in failed
+                    // Case sign in failed
                 } else {
                     handleException(task.exception, "Login Failed")
                     // Process done
@@ -146,7 +146,9 @@ class IgViewModel @Inject constructor(
             }
     }
 
-    // private function creating or updating profile (called from other methods in ViewModel)
+    // Private function creating or updating profile (called from other methods in ViewModel) - Encapsulation - hiding logic
+    // Take (name, username, bio, image url) as parameters which can be null
+
     private fun createOrUpdateProfile(
         name: String? = null,
         username: String? = null,
@@ -154,8 +156,11 @@ class IgViewModel @Inject constructor(
         imageUrl: String? = null
     ) {
         val uid = auth.currentUser?.uid
+
+        // create instance of UserData with values in the constructor,
         val userData = UserData(
             userId = uid,
+            // TODO why used currently loaded data in ViewModel, if null
             name = name ?: userData.value?.name,
             username = username ?: userData.value?.username,
             bio = bio ?: userData.value?.bio,
@@ -164,34 +169,43 @@ class IgViewModel @Inject constructor(
         )
 
         uid?.let { uid ->
+            // Create or Update in progress
             inProgress.value = true
+            // Retrieve user data from "USERS" collection on Firestore Database with current "uid" first
             db.collection(USERS).document(uid).get()
-
                 .addOnSuccessListener {
+                    // Case there is retrieved user data corresponding to current "uid"
                     if (it.exists()) {
+                        //Update retrieved data with new data
                         it.reference.update(userData.toMap())
+                            // Update success
                             .addOnSuccessListener {
                                 this.userData.value = userData
                                 inProgress.value = false
                             }
+                            // Update failure
                             .addOnFailureListener { exc ->
                                 handleException(exc, "Cannot update user")
                                 inProgress.value = false
                             }
+                    // Case no current "uid" exist on "USERS" collection on Firestore Database
                     } else {
+                        // Create new user in "USERS" collection with "uid"
                         db.collection(USERS).document(uid).set(userData)
+                        // Once stored data on Firestore Database -> retrieve it from server to make sure both data are the same
                         getUserData(uid)
                     }
                 }
-
+                // TODO why it is "Cannot create user"
                 .addOnFailureListener { exc ->
                     handleException(exc, "Cannot create user")
+                    // Process done
                     inProgress.value = false
                 }
         }
     }
 
-    // Private function to retrieve userdata from Firestore Database
+    // Private function to retrieve userdata from Firestore Database - Encapsulation
     private fun getUserData(uid: String) {
         // Process begin
         inProgress.value = true
@@ -199,9 +213,12 @@ class IgViewModel @Inject constructor(
         db.collection(USERS).document(uid).get()
 
             .addOnSuccessListener {
+                // Mapping retrieved data into UserData data model
                 val user = it.toObject<UserData>()
                 userData.value = user
+                // Process done
                 inProgress.value = false
+                // Once UserData refreshed -> refresh posts / get personalized feed / get followers with corresponding UserData
                 refreshPosts()
                 getPersonalizedFeed()
                 getFollowers(uid)
@@ -209,6 +226,7 @@ class IgViewModel @Inject constructor(
             // Handle failure to retrieving data from Firestore Database
             .addOnFailureListener { exc ->
                 handleException(exc, "Cannot retrieve user data")
+                // Process done
                 inProgress.value = false
             }
     }
@@ -220,6 +238,7 @@ class IgViewModel @Inject constructor(
         popupNotification.value = Event(message)
     }
 
+    // Private function to upload image on Firebase Storage and get
     private fun uploadImage(uri: Uri, onSuccess: (Uri) -> Unit) {
         inProgress.value = true
 

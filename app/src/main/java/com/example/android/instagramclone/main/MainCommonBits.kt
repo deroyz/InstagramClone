@@ -72,12 +72,18 @@ fun navigateTo(navController: NavController, dest: DestinationScreen, vararg par
     }
 }
 
+// Composable function checking if signed in
 @Composable
 fun CheckSignedIn(vm: IgViewModel, navController: NavController) {
+    //  Default already logged in state false
     val alreadyLoggedIn = remember { mutableStateOf(false) }
+    // Check state if signed in on Firebase Authentication
     val signedIn = vm.signedIn.value
+    // Case signed in on Firebase authentication + not yet logged in in application
     if (signedIn && !alreadyLoggedIn.value) {
+
         alreadyLoggedIn.value = true
+        // Show feed screen once logged in
         navController.navigate(DestinationScreen.Feed.route) {
             popUpTo(0)
         }
