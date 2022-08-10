@@ -28,7 +28,7 @@ class IgViewModel @Inject constructor(
     val db: FirebaseFirestore,
     val storage: FirebaseStorage,
 ) : ViewModel() {
-
+// Feature 1
     val signedIn = mutableStateOf(false)
     val inProgress = mutableStateOf(false)
     val userData = mutableStateOf<UserData?>(null)
