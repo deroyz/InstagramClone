@@ -21,7 +21,7 @@ import kotlin.Exception
 const val USERS = "users"
 const val POSTS = "posts"
 const val COMMENTS = "comments"
-
+//Feature_2
 @HiltViewModel
 class IgViewModel @Inject constructor(
     val auth: FirebaseAuth,
