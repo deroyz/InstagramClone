@@ -36,7 +36,7 @@ class IgViewModel @Inject constructor(
 //Feature 3
     val refreshPostsProgress = mutableStateOf(false)
     val posts = mutableStateOf<List<PostData>>(listOf())
-
+// Develop done
     val searchedPosts = mutableStateOf<List<PostData>>(listOf())
     val searchedPostsProgress = mutableStateOf(false)
 
